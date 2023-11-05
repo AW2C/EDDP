@@ -33,6 +33,7 @@ def load(logDir):
 
 def getCMDR(logs):
     print("Parsing log data")
+    cmdr_name = "CMDR"
     for log in logs:
         if "event" in log:
             try:
@@ -77,6 +78,8 @@ def getStation(logs):
 
 def eventHandler(event):
     print("Parsing log data - looking for events")
+    if event == "Shutdown":
+        return "0"
     if event in eventAssociationsMain:
         if eventAssociationsMain[event] == "Fileheader":
             print("Fileheader found, skipping")
