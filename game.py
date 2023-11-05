@@ -1,6 +1,10 @@
 import json
 import os
 import glob
+import getpass
+
+global username
+username = getpass.getuser()
 
 global eventAssociationsMain
 global eventAssociationsDocked
@@ -78,13 +82,13 @@ def eventHandler(event):
             print("Fileheader found, skipping")
         else:
             print(f"Found event: {event}")
-            system = getSystem(load("C:/Users/Nicey/Saved Games/Frontier Developments/Elite Dangerous"))
+            system = getSystem(load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous"))
             if system:  # Check if the string exists
                 return eventAssociationsMain[event] + system
             else:
                 return eventAssociationsMain[event]
     elif event in eventAssociationsDocked:
-        station = getStation(load("C:/Users/Nicey/Saved Games/Frontier Developments/Elite Dangerous"))
+        station = getStation(load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous"))
         if station:  # Check if the string exists
             print(f"Returning: {eventAssociationsDocked[event] + station}")
             return eventAssociationsDocked[event] + station

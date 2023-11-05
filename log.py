@@ -12,3 +12,4 @@ def onStart():
     print("Log file: " + logDir + "/" + logFile)
     print("Log directory: " + logDir)
     print("Log file: " + logFile)
+    return logDir + logFile
