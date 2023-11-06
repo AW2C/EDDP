@@ -5,22 +5,31 @@ import os
 import pystray
 from PIL import Image
 import threading
-
-from game import getCMDR, load, getSystem, eventHandler
+from game import getCMDR, load, eventHandler
+#END: module imports, START global variables
 global username
 username = getpass.getuser()
+global shutdownBool
+shutdownBool = False
+#END global variables, START functions
 
+#the icon for the tray
 def create_icon():
-    # Create an image for the icon
     image = Image.open('D:\github\EDDP\EDDP\icon.png')
     icon = pystray.Icon("EDDP", image)
-
-    # Define the action to be taken when the icon is clicked
+    #action for exit
     def action(icon, item):
+        shutdownBool = True
         icon.stop()
+    #action for the status text
+    def action_online(icon, item):
+        print("Online!")
 
     # Add a menu item to the icon
-    icon.menu = pystray.Menu(pystray.MenuItem('Quit', action))
+    icon.menu = pystray.Menu(
+        pystray.MenuItem('Online!', action_online),
+        pystray.MenuItem('Quit', action)
+        )
 
     # Run the icon
     icon.run()
@@ -60,6 +69,7 @@ def updatePrecense(presence, state, start_time, cmdr):
 client_id = "1170388114498392095"  
 
 def mainGameLoop():
+    currently = "Loading EDDP..."
     print("Starting game loop")
     start_time = int(time.time())
 
@@ -71,16 +81,26 @@ def mainGameLoop():
         print("Presence updated")
 
         while True:
+            if shutdownBool == True:
+                print("Shutdown detected, exiting...")
+                break
+            currently_old = currently
             time.sleep(15)
             logs = load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
+            print("Updating presence...")
+            logsToParse = []
             for log in logs:
                 if "event" in log:
-                    currently = eventHandler(log["event"])
-            if currently == "0":
-                print("Shutting down...")
-                break
-            else:        
-                updatePrecense(presence, currently, start_time, cmdr)
+                    logsToParse.append(log)
+            currently = eventHandler(logsToParse[-1]["event"], currently) # initial run, may not return an event it understands
+            i = 1
+            while currently == currently_old:
+                print("Event not understood, trying again (Attempt " + str(i) + ")" )
+                i += 1
+                currently = eventHandler(logsToParse[-i]["event"], currently)
+            updatePrecense(presence, currently, start_time, cmdr)
+            print("Presence updated")
+
 
 if __name__ == "__main__":
     icon_thread = threading.Thread(target=create_icon)

@@ -76,27 +76,27 @@ def getStation(logs):
                 print("No station found")
     return station_name
 
-def eventHandler(event):
+def eventHandler(event, old_event):
     print("Parsing log data - looking for events")
     if event == "Shutdown":
         return "0"
-    if event in eventAssociationsMain:
-        if eventAssociationsMain[event] == "Fileheader":
+    if event == "Fileheader":
             print("Fileheader found, skipping")
+
+    if event in eventAssociationsMain:
+        print(f"Found event: {event}")
+        system = getSystem(load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous"))
+        if system:  # Check if the string exists
+            return eventAssociationsMain[event] + system
         else:
-            print(f"Found event: {event}")
-            system = getSystem(load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous"))
-            if system:  # Check if the string exists
-                return eventAssociationsMain[event] + system
-            else:
-                return eventAssociationsMain[event]
+            return eventAssociationsMain[event] + "the milky way"
     elif event in eventAssociationsDocked:
         station = getStation(load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous"))
         if station:  # Check if the string exists
             print(f"Returning: {eventAssociationsDocked[event] + station}")
             return eventAssociationsDocked[event] + station
         else:
-            return eventAssociationsDocked[event]
+            return eventAssociationsDocked[event] + "a station"
     else:
         print(f"Unknown event: {event}")
-        return "Playing Elite: Dangerous"
+        return old_event
