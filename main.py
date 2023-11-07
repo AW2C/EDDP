@@ -11,6 +11,8 @@ global username
 username = getpass.getuser()
 global currently
 currently = "nope"
+global shutdownBool
+shutdownBool = False
 
 #the icon for the tray
 def create_icon():
@@ -84,15 +86,13 @@ def mainGameLoop():
             if shutdownBool == True:
                 print("Shutdown detected, exiting...")
                 break
-            currently_old = currently
             time.sleep(15)
             logs = load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
             j = 0
             while j < len(logs):
                 logLineNow = logs[j]
                 now = eventHandler(logLineNow["event"], j)
-                
-
+                print("Event: " + str(now) + " No: " + str(j))
                 j += 1
                 if now != 1:
                     currently = now

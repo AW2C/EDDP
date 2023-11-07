@@ -121,6 +121,9 @@ def eventHandler(event, logLineNum):
         if load(journalPath)[logLineNum]["Docked"] == True:
             print("Docked")
             return "Docked at " + getStation(load(journalPath))
+        else:
+            print("Not docked")
+            return "Flying in " + getSystem(load(journalPath))
 
     if event in eventAssociationsMain:
         if eventAssociationsMain[event] == "Fileheader":
@@ -138,4 +141,4 @@ def eventHandler(event, logLineNum):
             return eventAssociationsDocked[event] + "a station"
     else:
         print(f"Unknown event: {event}")
-        return "Flying in " + getSystem(load(journalPath))
+        return 1
