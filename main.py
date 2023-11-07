@@ -100,6 +100,10 @@ def mainGameLoop():
                     break
                 else: 
                     pass
+
+            if now == 0:
+                print("Exiting...")
+                break
             updatePrecense(presence, currently, start_time, cmdr)
             
             
