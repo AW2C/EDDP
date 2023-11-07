@@ -135,7 +135,7 @@ def eventHandler(event, logLineNum):
             print(f"Returning: {eventAssociationsDocked[event] + station}")
             return eventAssociationsDocked[event] + station
         else:
-            return eventAssociationsDocked[event]
+            return eventAssociationsDocked[event] + "a station"
     else:
         print(f"Unknown event: {event}")
         return "Flying in " + getSystem(load(journalPath))
