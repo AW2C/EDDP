@@ -51,10 +51,11 @@ def awaitGame():
             pass
 
 def updatePrecense(presence, state, start_time, cmdr):
+    state = str(state) + ".."
     presence.set(
         {
-            "state": state,
-            "details": "Playing Elite: Dangerous as CMDR " + cmdr,
+            "state": str(state),
+            "details": "Playing Elite: Dangerous as CMDR " + str(cmdr),
             "timestamps": {
                 "start": start_time,
             },
@@ -107,5 +108,4 @@ if __name__ == "__main__":
 
     # Start the thread
     icon_thread.start()
-    #awaitGame()
     mainGameLoop()
