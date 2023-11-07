@@ -6,18 +6,37 @@ import getpass
 global username
 username = getpass.getuser()
 
+global journalPath
+journalPath = (
+    "C:/Users/" + username + "/Saved Games/Frontier Developments/Elite Dangerous"
+)
+
+cmdr_name = "CMDR"
+
+
 global eventAssociationsMain
 global eventAssociationsDocked
 global eventAssociationsCombat
-eventAssociationsMain = {"SupercruiseEntry":"Supercrusing in ", "SupercruiseExit":"Flying in ", "FSDJump":"Jumping to ", "FSSSignalDiscovered": "In Supercruse", "Undocked": "Flying in "}
-eventAssociationsDocked = {"Touchdown":"Landed on ", "Docked": "Docked at ","DockingGranted": "Docked at "}
+eventAssociationsMain = {
+    "SupercruiseEntry": "Supercrusing in ",
+    "SupercruiseExit": "Flying in ",
+    "FSDJump": "Jumping to ",
+    "FSSSignalDiscovered": "In Supercruse",
+    "Undocked": "Flying in ",
+}
+eventAssociationsDocked = {
+    "Touchdown": "Landed on ",
+    "Docked": "Docked at ",
+    "DockingGranted": "Docked at ",
+}
 eventAssociationsCombat = {"UnderAttack": "In a fight!"}
+
 
 def load(logDir):
     print("Parsing log file")
-    log_files = glob.glob(os.path.join(logDir, '*.log'))
+    log_files = glob.glob(os.path.join(logDir, "*.log"))
     latest_file = max(log_files, key=os.path.getmtime)
-    print("opening log file " + str(latest_file))
+    print("Opening log file " + str(latest_file))
     res = []
     with open(latest_file) as f:
         for line in f:
@@ -28,42 +47,44 @@ def load(logDir):
                     res.append(data)
                 except json.JSONDecodeError:
                     print(f"Skipping line: {line}")
+    res.reverse()  # so that it will stop when at the latest event it recognizes
     return res
 
 
 def getCMDR(logs):
     print("Parsing log data")
-    cmdr_name = "CMDR"
+    logs.reverse()  # becuase we want the first one. Undoes line 34
+    cmdr_name = " "
     for log in logs:
         if "event" in log:
             try:
                 if log["event"] == "Commander":
                     cmdr_name = log.get("Name", "")
                     print(f"Found commander: {cmdr_name}")
+                    return cmdr_name
             except Exception:
                 print("No commander found")
-    return cmdr_name
+                return "Unknown"
+
 
 def getSystem(logs):
     print("Parsing log data - looking for system")
+    system_name = " "
+    system_name_2 = " "
     j = 0
     for log in logs:
-        j+1
+        j + 1
         if "event" in log:
             try:
                 if log["event"] == "Location":
                     system_name = log.get("StarSystem", "")
                     print(f"Found system: {system_name}")
-                if log["event"] == "SupercruiseEntry":
-                    system_name_2 = log.get("StarSystem", "")
-                    print(f"Found system: {system_name}")
+                    return system_name  # because we start with the latest one, we can just return it straight away
             except Exception:
                 print("No system found")
-    if system_name == system_name_2:
-        return system_name
-    else:
-        return system_name_2
-    
+                return "Unknown system"
+
+
 def getStation(logs):
     print("Parsing log data - looking for station")
     for log in logs:
@@ -72,26 +93,44 @@ def getStation(logs):
                 if log["event"] == "Location":
                     station_name = log.get("StationName", "")
                     print(f"Found station: {station_name}")
+                    return station_name
             except Exception:
                 print("No station found")
-    return station_name
+                return "Unknown station"
 
-def eventHandler(event):
-    print("Parsing log data - looking for events")
+
+def eventHandler(event, logLineNum):
+    """
+    Event handler for journal events. 
+    Run once per line.
+    Accepts event as string.
+    Returns event type as string. 
+    If the event is not recognized, it will return 1.
+    If the event is recognized, it will return the event type as a string.
+    If it detects a shutdown, it will return 0.
+    
+    """
+    print("Parsing log data - looking for events in " + str(event) + "...")
+    #Error handling
     if event == "Shutdown":
-        return "0"
+        return 0
+    if event == "Fileheader":
+        return 1
+    if event == "Location":
+        print("Found event: Location. Checking if docked")
+        if load(journalPath)[logLineNum]["Docked"] == True:
+            print("Docked")
+            return "Docked at " + getStation(load(journalPath))
+
     if event in eventAssociationsMain:
         if eventAssociationsMain[event] == "Fileheader":
             print("Fileheader found, skipping")
         else:
             print(f"Found event: {event}")
-            system = getSystem(load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous"))
-            if system:  # Check if the string exists
-                return eventAssociationsMain[event] + system
-            else:
-                return eventAssociationsMain[event]
+            system = getSystem(load(journalPath))
+            return eventAssociationsMain[event] + system
     elif event in eventAssociationsDocked:
-        station = getStation(load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous"))
+        station = getStation(load(journalPath))
         if station:  # Check if the string exists
             print(f"Returning: {eventAssociationsDocked[event] + station}")
             return eventAssociationsDocked[event] + station
@@ -99,4 +138,4 @@ def eventHandler(event):
             return eventAssociationsDocked[event]
     else:
         print(f"Unknown event: {event}")
-        return "Playing Elite: Dangerous"
+        return "Flying in " + getSystem(load(journalPath))

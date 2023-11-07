@@ -6,9 +6,11 @@ import pystray
 from PIL import Image
 import threading
 
-from game import getCMDR, load, getSystem, eventHandler
+from game import getCMDR, load, eventHandler
 global username
 username = getpass.getuser()
+global currently
+currently = "nope"
 
 def create_icon():
     # Create an image for the icon
@@ -61,6 +63,7 @@ client_id = "1170388114498392095"
 
 def mainGameLoop():
     print("Starting game loop")
+    currently = " "
     start_time = int(time.time())
 
     with Presence(client_id) as presence:
@@ -73,18 +76,25 @@ def mainGameLoop():
         while True:
             time.sleep(15)
             logs = load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
-            for log in logs:
-                if "event" in log:
-                    currently = eventHandler(log["event"])
-            if currently == "0":
-                print("Shutting down...")
-                break
-            else:        
-                updatePrecense(presence, currently, start_time, cmdr)
+            j = 0
+            while j < len(logs):
+                logLineNow = logs[j]
+                now = eventHandler(logLineNow["event"], j)
+                
 
+                j += 1
+                if now != 1:
+                    currently = now
+                    break
+                else: 
+                    pass
+            updatePrecense(presence, currently, start_time, cmdr)
+            
+            
 if __name__ == "__main__":
     icon_thread = threading.Thread(target=create_icon)
 
     # Start the thread
     icon_thread.start()
-    awaitGame()
+    #awaitGame()
+    mainGameLoop()
