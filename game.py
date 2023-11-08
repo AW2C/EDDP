@@ -13,7 +13,6 @@ journalPath = (
 
 cmdr_name = "CMDR"
 
-
 global eventAssociationsMain
 global eventAssociationsDocked
 global eventAssociationsCombat
@@ -33,6 +32,10 @@ eventAssociationsCombat = {"UnderAttack": "In a fight!"}
 
 
 def load(logDir):
+    """
+    Loads the log file and returns it as a list.
+    Accepts logDir as string.
+    """
     print("Parsing log file")
     log_files = glob.glob(os.path.join(logDir, "*.log"))
     latest_file = max(log_files, key=os.path.getmtime)
@@ -52,6 +55,10 @@ def load(logDir):
 
 
 def getCMDR(logs):
+    """
+    Returns the commander name as a string.
+    Accepts logs as a list. (array)
+    """
     print("Parsing log data")
     logs.reverse()  # becuase we want the first one. Undoes line 34
     cmdr_name = " "
@@ -68,18 +75,23 @@ def getCMDR(logs):
 
 
 def getSystem(logs):
+    """
+    Returns the system name as a string.
+    Accepts logs as a list. (array)
+    """
     print("Parsing log data - looking for system")
     system_name = " "
-    system_name_2 = " "
-    j = 0
     for log in logs:
-        j + 1
         if "event" in log:
             try:
                 if log["event"] == "Location":
                     system_name = log.get("StarSystem", "")
                     print(f"Found system: {system_name}")
-                    return system_name  # because we start with the latest one, we can just return it straight away
+                    return system_name  # because we start with the latest one, we can just return it straight away 
+                if log["event"] == "FSDJump":
+                    system_name = log.get("StarSystem", "")
+                    print(f"Found system: {system_name}")
+                    return system_name
             except Exception:
                 print("No system found")
                 return "Unknown system"
