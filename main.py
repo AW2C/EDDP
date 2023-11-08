@@ -38,7 +38,7 @@ def create_icon():
 
 
 def awaitGame():
-    log("Awaiting game")
+    log("Awaiting game", "awaitGame")
     while True:
         #list logs dir
         listOne = os.listdir("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
@@ -114,5 +114,5 @@ if __name__ == "__main__":
 
     # Start the thread
     icon_thread.start()
-    mainGameLoop()
+    awaitGame()
     #remember to look at jumping error! and docking granted error :D

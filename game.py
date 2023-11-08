@@ -139,10 +139,10 @@ def eventHandler(event, logLineNum):
         log("Found event: Location. Checking if docked", "eventHandler")
         is_docked = load(journalPath)[logLineNum]["Docked"]
         if is_docked:
-            log("Docked")
+            log("Docked", "eventHandler")
             return f"Docked at {getStation(load(journalPath))}"
         else:
-            log("Not docked")
+            log("Not docked", "eventHandler")
             return f"Flying in {getSystem(load(journalPath))}"
 
     # Check event associations
