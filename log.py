@@ -7,9 +7,18 @@ logDir =  "C:/Users/"+username+"/.AW2C/EDDP/logs"
 global logFile
 logFile = "LOG - " + str(datetime.datetime.now().strftime("%Y-%m-%d")) + ".log"
 
-def onStart():
-    print("EDDP started")
-    print("Log file: " + logDir + "/" + logFile)
-    print("Log directory: " + logDir)
-    print("Log file: " + logFile)
-    return logDir + logFile
+
+def logToConsole(logMessage, function):
+    out = "EDDP." + function + ": " + logMessage
+    print(out)
+
+def logToFile(logMessage, function):
+    out = "eddp." + function + ": " + logMessage
+    with open(logDir + "/" + logFile, "a") as f:
+        f.write(out + "\n")
+    f.close()
+
+def log(logMessage, function):
+    logToConsole(logMessage, function)
+    #logToFile(logMessage, function)
+    return True
