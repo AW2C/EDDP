@@ -19,8 +19,8 @@ global eventAssociationsCombat
 eventAssociationsMain = {
     "SupercruiseEntry": "Supercrusing in ",
     "SupercruiseExit": "Flying in ",
-    "FSDJump": "Jumping to ",
-    "FSSSignalDiscovered": "In Supercruse",
+    "FSDJump": "Supercrusing in ",
+    "FSSSignalDiscovered": "Supercrusing in ",
     "Undocked": "Flying in ",
 }
 eventAssociationsDocked = {
@@ -98,6 +98,10 @@ def getSystem(logs):
 
 
 def getStation(logs):
+    """
+    Returns the station name as a string.
+    Accepts logs as a list. (array)
+    """
     print("Parsing log data - looking for station")
     for log in logs:
         if "event" in log:
@@ -106,9 +110,9 @@ def getStation(logs):
                     station_name = log.get("StationName", "")
                     print(f"Found station: {station_name}")
                     return station_name
-            except Exception:
+            except Exception: # If it gets muddled, it will return "Unknown station"
                 print("No station found")
-                return "Unknown station"
+                return "Unknown station" 
 
 
 def eventHandler(event, logLineNum):
@@ -116,7 +120,6 @@ def eventHandler(event, logLineNum):
     Event handler for journal events. 
     Run once per line.
     Accepts event as string.
-    Returns event type as string. 
     If the event is not recognized, it will return 1.
     If the event is recognized, it will return the event type as a string.
     If it detects a shutdown, it will return 0.

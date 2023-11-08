@@ -99,6 +99,7 @@ def mainGameLoop():
                     currently = now
                     break
                 else: 
+                    currently = "In the main menu"
                     pass
 
             if now == 0:
