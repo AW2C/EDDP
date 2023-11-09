@@ -17,12 +17,15 @@ cmdr_name = "CMDR"
 global eventAssociationsMain
 global eventAssociationsDocked
 global eventAssociationsCombat
+global eventAssociationsPlanetside
 eventAssociationsMain = {
     "SupercruiseEntry": "Supercrusing in ",
-    "SupercruiseExit": "Flying in ",
+    "SupercruiseExit": "Flying around ",
     "FSDJump": "Supercrusing in ",
     "FSSSignalDiscovered": "Supercrusing in ",
     "Undocked": "Flying in ",
+    "LeaveBody": "Flying in ",
+    "Location": "Flying in ",
 }
 eventAssociationsDocked = {
     "Touchdown": "Landed on ",
@@ -30,6 +33,7 @@ eventAssociationsDocked = {
     "DockingGranted": "Docked at ",
 }
 eventAssociationsCombat = {"UnderAttack": "In a fight!"}
+eventAssociationsPlanetside = {"LaunchSRV": "Driving on ", "ApproachBody": "Flying to ", }
 
 
 def load(logDir):
@@ -131,26 +135,17 @@ def eventHandler(event, logLineNum):
     # Error handling
     if event == "Shutdown":
         return 0
-    if event == "Fileheader":
-        return 1
-
-    # Check if docked
-    if event == "Location":
-        log("Found event: Location. Checking if docked", "eventHandler")
-        is_docked = load(journalPath)[logLineNum]["Docked"]
-        if is_docked:
-            log("Docked", "eventHandler")
-            return f"Docked at {getStation(load(journalPath))}"
+    try:
+        if event in eventAssociationsMain:
+            return eventAssociationsMain[event] + getSystem(load(journalPath))
+        elif event in eventAssociationsDocked:
+            return eventAssociationsDocked[event] + getStation(load(journalPath))
+        elif event in eventAssociationsCombat:
+            return eventAssociationsCombat[event]
+        elif event in eventAssociationsPlanetside:
+            return eventAssociationsPlanetside[event] + getSystem(load(journalPath))
         else:
-            log("Not docked", "eventHandler")
-            return f"Flying in {getSystem(load(journalPath))}"
-
-    # Check event associations
-    event_associations = eventAssociationsMain if event in eventAssociationsMain else eventAssociationsDocked
-    if event in event_associations:
-        log(f"Found event: {event}", "eventHandler")
-        location = getStation(load(journalPath)) if event in eventAssociationsDocked else getSystem(load(journalPath))
-        return f"{event_associations[event]}{location}"
-    else:
-        log(f"Unknown event: {event}", "eventHandler")
+            return 1
+    except Exception:
         return 1
+        

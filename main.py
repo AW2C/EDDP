@@ -115,4 +115,3 @@ if __name__ == "__main__":
     # Start the thread
     icon_thread.start()
     awaitGame()
-    #remember to look at jumping error! and docking granted error :D
