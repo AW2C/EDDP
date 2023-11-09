@@ -106,7 +106,8 @@ def mainGameLoop():
 
             if now == 0:
                 log("Exiting...", "mainGameLoop")
-                break
+                exit()
+                
             updatePrecense(presence, currently, start_time, cmdr)
             
             
