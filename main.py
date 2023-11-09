@@ -72,6 +72,7 @@ def updatePrecense(presence, state, start_time, cmdr):
 client_id = "1170388114498392095"  
 
 def mainGameLoop():
+    time.sleep(1)
     currently = "Loading EDDP..."
     log("Starting game loop", "mainGameLoop")
     currently = " "
@@ -93,7 +94,7 @@ def mainGameLoop():
             j = 0
             while j < len(logs):
                 logLineNow = logs[j]
-                now, logLineCount = eventHandler(logLineNow["event"], j)
+                now = eventHandler(logLineNow["event"], j)
                 log("Event: " + str(now) + " No: " + str(j), "mainGameLoop")
                 j += 1
                 if now != 1:
@@ -114,4 +115,5 @@ if __name__ == "__main__":
 
     # Start the thread
     icon_thread.start()
+    #mainGameLoop()
     awaitGame()

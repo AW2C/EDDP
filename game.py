@@ -46,6 +46,7 @@ def load(logDir):
     latest_file = max(log_files, key=os.path.getmtime)
     log("Opening log file " + str(latest_file), "load")
     res = []
+    i = 0
     with open(latest_file) as f:
         for line in f:
             line = line.strip()  # Remove leading/trailing whitespace
@@ -53,10 +54,12 @@ def load(logDir):
                 try:
                     data = json.loads(line)
                     res.append(data)
+                    i = i +1
                 except json.JSONDecodeError:
                     log(f"Skipping line: {line}", "load")
+    log("Log file parsed, "  + str(i) + " lines found", "load")
     res.reverse()  # so that it will stop when at the latest event it recognizes
-    return res, len(res)
+    return res
 
 
 def getCMDR(logs):
@@ -121,7 +124,7 @@ def getStation(logs):
 
 
 
-def eventHandler(event, logLineNum):
+def eventHandler(event, logLineNum=0):
     """
     Event handler for journal events.
     Run once per line.
