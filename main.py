@@ -6,11 +6,14 @@ import pystray
 from PIL import Image
 import threading
 
+from log import log
 from game import getCMDR, load, eventHandler
 global username
 username = getpass.getuser()
 global currently
 currently = "nope"
+global shutdownBool
+shutdownBool = False
 
 #the icon for the tray
 def create_icon():
@@ -22,7 +25,7 @@ def create_icon():
         icon.stop()
     #action for the status text
     def action_online(icon, item):
-        print("Online!")
+        log("Online!")
 
     # Add a menu item to the icon
     icon.menu = pystray.Menu(
@@ -35,24 +38,25 @@ def create_icon():
 
 
 def awaitGame():
-    print("Awaiting game")
+    log("Awaiting game", "awaitGame")
     while True:
         #list logs dir
         listOne = os.listdir("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
         time.sleep(15)
         listTwo = os.listdir("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
         if listOne != listTwo:
-            print("Game found")
+            log("Game found", "awaitGame")
             mainGameLoop()
         else:
-            print("Game not found")
+            log("Game not found", "awaitGame")
             pass
 
 def updatePrecense(presence, state, start_time, cmdr):
+    state = str(state) + ".."
     presence.set(
         {
-            "state": state,
-            "details": "Playing Elite: Dangerous as CMDR " + cmdr,
+            "state": str(state),
+            "details": "Playing Elite: Dangerous as CMDR " + str(cmdr),
             "timestamps": {
                 "start": start_time,
             },
@@ -68,37 +72,42 @@ def updatePrecense(presence, state, start_time, cmdr):
 client_id = "1170388114498392095"  
 
 def mainGameLoop():
+    time.sleep(1)
     currently = "Loading EDDP..."
-    print("Starting game loop")
+    log("Starting game loop", "mainGameLoop")
     currently = " "
     start_time = int(time.time())
 
     with Presence(client_id) as presence:
         logFileLoaded = load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
-        print("Connected")
+        log("Connected", "mainGameLoop")
         cmdr = getCMDR(logFileLoaded)
         updatePrecense(presence, "In the main menu", start_time, cmdr)
-        print("Presence updated")
+        log("Presence updated", "mainGameLoop")
 
         while True:
             if shutdownBool == True:
-                print("Shutdown detected, exiting...")
+                log("Shutdown detected, exiting...", "mainGameLoop")
                 break
-            currently_old = currently
             time.sleep(15)
             logs = load("C:/Users/"+username+"/Saved Games/Frontier Developments/Elite Dangerous")
             j = 0
             while j < len(logs):
                 logLineNow = logs[j]
                 now = eventHandler(logLineNow["event"], j)
-                
-
+                log("Event: " + str(now) + " No: " + str(j), "mainGameLoop")
                 j += 1
                 if now != 1:
                     currently = now
                     break
                 else: 
+                    currently = "In the main menu"
                     pass
+
+            if now == 0:
+                log("Exiting...", "mainGameLoop")
+                exit()
+                
             updatePrecense(presence, currently, start_time, cmdr)
             
             
@@ -107,5 +116,5 @@ if __name__ == "__main__":
 
     # Start the thread
     icon_thread.start()
-    #awaitGame()
-    mainGameLoop()
+    #mainGameLoop()
+    awaitGame()
