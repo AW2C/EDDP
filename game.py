@@ -56,7 +56,7 @@ def load(logDir):
                 except json.JSONDecodeError:
                     log(f"Skipping line: {line}", "load")
     res.reverse()  # so that it will stop when at the latest event it recognizes
-    return res
+    return res, len(res)
 
 
 def getCMDR(logs):

@@ -93,7 +93,7 @@ def mainGameLoop():
             j = 0
             while j < len(logs):
                 logLineNow = logs[j]
-                now = eventHandler(logLineNow["event"], j)
+                now, logLineCount = eventHandler(logLineNow["event"], j)
                 log("Event: " + str(now) + " No: " + str(j), "mainGameLoop")
                 j += 1
                 if now != 1:
